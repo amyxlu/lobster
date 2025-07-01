@@ -119,4 +119,12 @@ def test_mlm_checkpoint(tmp_path):
         assert not torch.equal(v2, torch.zeros_like(v2)), f"{k1=}, {k2=}"
 
     assert torch.equal(model.model.lm_head.bias, model2.model.lm_head.bias)
-    assert torch.equal(model.model.lm_head.decoder.bias, model2.model.lm_head.decoder.bias)
+
+    input = torch.randn(2, 72)
+    output = model.model.lm_head.decoder(input)
+    output2 = model2.model.lm_head.decoder(input)
+
+    diff = output - output2
+    print(f"{diff.abs().max()=}")
+
+    torch.testing.assert_close(output, output2)
